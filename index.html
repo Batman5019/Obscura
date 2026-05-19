@@ -1,236 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Obscura — Lua Obfuscator</title>
+
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;500;700&display=swap');
-
-  :root {
-    --bg: #0a0c10;
-    --panel: #0f1218;
-    --border: #1e2530;
-    --accent: #00e5ff;
-    --accent2: #ff3cac;
-    --text: #c8d8e8;
-    --muted: #4a5568;
-    --glow: 0 0 18px #00e5ff55;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Rajdhani', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 40px 20px;
-    background-image:
-      radial-gradient(ellipse at 20% 10%, #00e5ff0a 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 90%, #ff3cac08 0%, transparent 50%);
-  }
-
-  header {
-    text-align: center;
-    margin-bottom: 40px;
-  }
-
-  .logo {
-    font-size: 3.2rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-transform: uppercase;
-  }
-
-  .tagline {
-    font-size: 0.95rem;
-    color: var(--muted);
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    margin-top: 6px;
-  }
-
-  .container {
-    width: 100%;
-    max-width: 960px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .panels {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
-
-  @media (max-width: 700px) {
-    .panels { grid-template-columns: 1fr; }
-  }
-
-  .panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .panel-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 16px;
-    background: #12161e;
-    border-bottom: 1px solid var(--border);
-    font-size: 0.75rem;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .panel-header .dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--accent);
-    box-shadow: var(--glow);
-  }
-
-  textarea {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--text);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.82rem;
-    line-height: 1.6;
-    padding: 16px;
-    resize: none;
-    min-height: 320px;
-  }
-
-  textarea::placeholder { color: #2a3a4a; }
-
-  .controls {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-
-  .options {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px 20px;
-    display: flex;
-    gap: 24px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-
-  .options label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.85rem;
-    letter-spacing: 0.1em;
-    cursor: pointer;
-    color: var(--text);
-    user-select: none;
-  }
-
-  .options input[type=checkbox] {
-    accent-color: var(--accent);
-    width: 15px; height: 15px;
-  }
-
-  .opt-title {
-    font-size: 0.7rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-right: 8px;
-  }
-
-  button {
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: 700;
-    font-size: 0.9rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    border: none;
-    border-radius: 7px;
-    cursor: pointer;
-    padding: 11px 28px;
-    transition: all 0.2s;
-  }
-
-  .btn-primary {
-    background: linear-gradient(90deg, var(--accent), #0099bb);
-    color: #000;
-    box-shadow: 0 0 20px #00e5ff33;
-  }
-  .btn-primary:hover { box-shadow: 0 0 30px #00e5ff66; transform: translateY(-1px); }
-  .btn-primary:active { transform: translateY(0); }
-
-  .btn-secondary {
-    background: transparent;
-    color: var(--muted);
-    border: 1px solid var(--border);
-  }
-  .btn-secondary:hover { color: var(--text); border-color: var(--accent); }
-
-  .btn-copy {
-    background: transparent;
-    color: var(--accent);
-    border: 1px solid var(--accent);
-    padding: 5px 14px;
-    font-size: 0.72rem;
-  }
-  .btn-copy:hover { background: #00e5ff15; }
-
-  .status {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--muted);
-    min-height: 18px;
-    text-align: center;
-    letter-spacing: 0.1em;
-  }
-
-  .status.ok { color: var(--accent); }
-  .status.err { color: var(--accent2); }
-
-  footer {
-    margin-top: 32px;
-    font-size: 0.72rem;
-    letter-spacing: 0.2em;
-    color: #2a3a4a;
-    text-transform: uppercase;
-  }
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;500;700&display=swap');
+:root{--acc:#00e5ff;--acc2:#ff3cac;--bg:#0a0c10;--panel:#0f1218;--brd:#1e2530;--txt:#c8d8e8;--mut:#4a5568;}
+*{box-sizing:border-box;margin:0;padding:0;}
+.wrap{background:var(--bg);color:var(--txt);font-family:'Rajdhani',sans-serif;padding:28px 16px;border-radius:10px;background-image:radial-gradient(ellipse at 20% 10%,#00e5ff0a 0%,transparent 50%),radial-gradient(ellipse at 80% 90%,#ff3cac08 0%,transparent 50%);}
+.logo{font-size:2.4rem;font-weight:700;letter-spacing:.15em;background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-transform:uppercase;text-align:center;}
+.tagline{font-size:.8rem;color:var(--mut);letter-spacing:.3em;text-transform:uppercase;margin-top:4px;text-align:center;margin-bottom:20px;}
+.opts{background:var(--panel);border:1px solid var(--brd);border-radius:10px;padding:12px 16px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:16px;}
+.opt-title{font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:var(--mut);margin-right:4px;}
+.opts label{display:flex;align-items:center;gap:6px;font-size:.82rem;letter-spacing:.08em;cursor:pointer;color:var(--txt);}
+.opts input[type=checkbox]{accent-color:var(--acc);width:14px;height:14px;}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+@media(max-width:600px){.panels{grid-template-columns:1fr;}}
+.panel{background:var(--panel);border:1px solid var(--brd);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;}
+.ph{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#12161e;border-bottom:1px solid var(--brd);font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--mut);}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--acc);}
+textarea{flex:1;background:transparent;border:none;outline:none;color:var(--txt);font-family:'Share Tech Mono',monospace;font-size:.78rem;line-height:1.6;padding:14px;resize:none;min-height:280px;}
+textarea::placeholder{color:#2a3a4a;}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+button{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.18em;text-transform:uppercase;border:none;border-radius:7px;cursor:pointer;padding:9px 22px;transition:all .2s;}
+.btn-p{background:linear-gradient(90deg,var(--acc),#0099bb);color:#000;}
+.btn-p:hover{opacity:.9;}
+.btn-s{background:transparent;color:var(--mut);border:1px solid var(--brd);}
+.btn-s:hover{color:var(--txt);border-color:var(--acc);}
+.btn-c{background:transparent;color:var(--acc);border:1px solid var(--acc);padding:4px 12px;font-size:.68rem;}
+.btn-c:hover{background:#00e5ff15;}
+.status{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--mut);min-height:16px;text-align:center;letter-spacing:.1em;margin-top:10px;}
+.ok{color:var(--acc);} .err{color:var(--acc2);}
 </style>
-</head>
-<body>
 
-<header>
+<div class="wrap">
+  <h2 class="sr-only">Obscura Lua obfuscator — paste Lua source, click Obfuscate, copy output</h2>
   <div class="logo">Obscura</div>
-  <div class="tagline">Lua Source Obfuscator</div>
-</header>
+  <div class="tagline">Lua Source Obfuscator — Fixed</div>
 
-<div class="container">
-
-  <div class="options">
+  <div class="opts">
     <span class="opt-title">Techniques:</span>
     <label><input type="checkbox" id="opt-nums" checked> String → Byte Arrays</label>
     <label><input type="checkbox" id="opt-vars" checked> Variable Renaming</label>
@@ -241,217 +45,177 @@
 
   <div class="panels">
     <div class="panel">
-      <div class="panel-header">
-        <span>Input · Lua Source</span>
-        <div class="dot"></div>
-      </div>
+      <div class="ph"><span>Input · Lua Source</span><div class="dot"></div></div>
       <textarea id="input" placeholder="-- paste your Lua code here&#10;local msg = &quot;Hello, World!&quot;&#10;print(msg)"></textarea>
     </div>
     <div class="panel">
-      <div class="panel-header">
-        <span>Output · Obfuscated</span>
-        <button class="btn-copy" onclick="copyOutput()">Copy</button>
-      </div>
+      <div class="ph"><span>Output · Obfuscated</span><button class="btn-c" onclick="copyOutput()">Copy</button></div>
       <textarea id="output" readonly placeholder="-- obfuscated output will appear here"></textarea>
     </div>
   </div>
 
   <div class="controls">
-    <button class="btn-primary" onclick="obfuscate()">⚡ Obfuscate</button>
-    <button class="btn-secondary" onclick="clearAll()">Clear</button>
-    <button class="btn-secondary" onclick="loadExample()">Load Example</button>
+    <button class="btn-p" onclick="obfuscate()">⚡ Obfuscate</button>
+    <button class="btn-s" onclick="clearAll()">Clear</button>
+    <button class="btn-s" onclick="loadExample()">Load Example</button>
   </div>
-
   <div class="status" id="status"></div>
-
 </div>
 
-<footer>Obscura · Lua Obfuscator</footer>
-
 <script>
-// ── Helpers ──────────────────────────────────────────────────────────────────
+function randHex(n){let s='';for(let i=0;i<n;i++)s+=Math.floor(Math.random()*16).toString(16);return s;}
+function randId(){const seg=Math.floor(Math.random()*3)+2;let p=[];for(let i=0;i<seg;i++)p.push('0x'+randHex(4));return '_'+p.join('__')+'_';}
 
-function randHex(n) {
-  let s = '';
-  for (let i = 0; i < n; i++) s += Math.floor(Math.random()*16).toString(16);
-  return s;
-}
-
-// Base-level identifier: looks like _0x3f9a__0xb2c1__0xe77f_ etc.
-function randId() {
-  const segments = Math.floor(Math.random() * 3) + 2; // 2-4 segments
-  let parts = [];
-  for (let i = 0; i < segments; i++) parts.push('0x' + randHex(4));
-  return '_' + parts.join('__') + '_';
-}
-
-function strToBytes(str) {
-  // Convert a string to Lua string.char(...) call
-  const bytes = Array.from(str).map(c => c.charCodeAt(0));
+function strToBytes(str){
+  const bytes=Array.from(str).map(c=>c.charCodeAt(0));
   return `string.char(${bytes.join(',')})`;
 }
 
-function encodeNumber(n) {
-  // Encode a plain integer as a math expression
-  const a = Math.floor(Math.random() * 500) + 1;
-  const b = n - a;
+// FIX: number encoding now skips anything inside string.char(...) 
+// by working on a masked copy of the code
+function encodeNumber(n){
+  const a=Math.floor(Math.random()*500)+1;
+  const b=n-a;
   return `(${a}+${b})`;
 }
 
-// ── Variable Renaming ─────────────────────────────────────────────────────────
+function obfuscateNumbers(code){
+  // Mask all string.char(...) regions so we don't touch their args
+  const placeholders=[];
+  const masked=code.replace(/string\.char\([^)]+\)/g,(match)=>{
+    const id=`__STRCHAR_${placeholders.length}__`;
+    placeholders.push(match);
+    return id;
+  });
 
-function renameVariables(code) {
-  // Find local variable names and rename them
-  const varMap = {};
-  // Match: local varname or local varname, varname2 ...
-  const localRe = /\blocal\s+([\w,\s]+?)(?=\s*[=\n\r])/g;
-  let m;
-  while ((m = localRe.exec(code)) !== null) {
-    const names = m[1].split(',').map(s => s.trim()).filter(Boolean);
-    for (const name of names) {
-      if (name && !varMap[name] && !/^(true|false|nil|and|or|not|end|do|then|else|elseif|function|for|while|repeat|until|return|break|in|local)$/.test(name)) {
-        varMap[name] = randId(6);
-      }
-    }
-  }
-  // Also rename function params
-  const fnRe = /\bfunction\s+\w*\s*\(([^)]*)\)/g;
-  while ((m = fnRe.exec(code)) !== null) {
-    const params = m[1].split(',').map(s => s.trim()).filter(Boolean);
-    for (const p of params) {
-      if (p && !varMap[p]) varMap[p] = randId(6);
-    }
-  }
+  // Also mask string literals that survived (shouldn't be many but just in case)
+  const masked2=masked.replace(/(["'])((?:\\.|(?!\1)[^\\])*?)\1/g,(match)=>{
+    const id=`__STR_${placeholders.length}__`;
+    placeholders.push(match);
+    return id;
+  });
 
-  let result = code;
-  for (const [orig, obf] of Object.entries(varMap)) {
-    // Replace whole-word occurrences
-    result = result.replace(new RegExp(`\\b${orig}\\b`, 'g'), obf);
+  // Now safely encode bare numbers
+  const encoded=masked2.replace(/\b(\d+)\b/g,(match,num)=>{
+    if(/^__STRCHAR_\d+__$/.test(match)||/^__STR_\d+__$/.test(match)) return match;
+    const n=parseInt(num,10);
+    if(isNaN(n)||n>100000) return match;
+    return encodeNumber(n);
+  });
+
+  // Restore placeholders
+  let result=encoded;
+  for(let i=placeholders.length-1;i>=0;i--){
+    result=result.replace(`__STRCHAR_${i}__`,placeholders[i]).replace(`__STR_${i}__`,placeholders[i]);
   }
   return result;
 }
 
-// ── String Obfuscation ────────────────────────────────────────────────────────
-
-function obfuscateStrings(code) {
-  // Replace "..." and '...' string literals with byte arrays
-  // Be careful not to replace strings that are part of require paths if they look like module names
-  return code.replace(/(["'])((?:\\.|(?!\1)[^\\])*?)\1/g, (match, q, content) => {
-    if (content.length === 0) return match;
-    try {
-      return strToBytes(content);
-    } catch(e) {
-      return match;
+function renameVariables(code){
+  const varMap={};
+  const KW=/^(true|false|nil|and|or|not|end|do|then|else|elseif|function|for|while|repeat|until|return|break|in|local|print|pairs|ipairs|tostring|tonumber|type|math|string|table|io|os)$/;
+  const localRe=/\blocal\s+([\w,\s]+?)(?=\s*[=\n\r])/g;
+  let m;
+  while((m=localRe.exec(code))!==null){
+    const names=m[1].split(',').map(s=>s.trim()).filter(Boolean);
+    for(const name of names){
+      if(name&&!varMap[name]&&!KW.test(name)) varMap[name]=randId();
     }
+  }
+  const fnRe=/\bfunction\s+\w*\s*\(([^)]*)\)/g;
+  while((m=fnRe.exec(code))!==null){
+    const params=m[1].split(',').map(s=>s.trim()).filter(Boolean);
+    for(const p of params){if(p&&!varMap[p]&&!KW.test(p)) varMap[p]=randId();}
+  }
+  let result=code;
+  for(const[orig,obf]of Object.entries(varMap)){
+    result=result.replace(new RegExp(`\\b${orig}\\b`,'g'),obf);
+  }
+  return result;
+}
+
+function obfuscateStrings(code){
+  return code.replace(/(["'])((?:\\.|(?!\1)[^\\])*?)\1/g,(match,q,content)=>{
+    if(content.length===0) return match;
+    try{return strToBytes(content);}catch(e){return match;}
   });
 }
 
-// ── Number Encoding ───────────────────────────────────────────────────────────
-
-function obfuscateNumbers(code) {
-  return code.replace(/\b(\d+)\b/g, (match, num) => {
-    const n = parseInt(num, 10);
-    if (isNaN(n) || n > 100000) return match;
-    return encodeNumber(n);
-  });
-}
-
-// ── Junk Insertion ────────────────────────────────────────────────────────────
-
-const JUNK_LINES = [
-  () => `local ${randId(5)} = (${Math.floor(Math.random()*999)}*${Math.floor(Math.random()*99)})`,
-  () => `local ${randId(5)} = string.char(${Math.floor(Math.random()*90)+32})`,
-  () => `local ${randId(5)} = math.floor(${Math.floor(Math.random()*999)}/${Math.floor(Math.random()*9)+1})`,
-  () => `local ${randId(5)} = (${Math.floor(Math.random()*99)}^${Math.floor(Math.random()*3)+1})`,
-  () => `-- ${Array.from({length:8}, ()=>Math.floor(Math.random()*256).toString(16).padStart(2,'0')).join('')}`,
+const JUNK=[
+  ()=>`local ${randId()} = (${Math.floor(Math.random()*999)}*${Math.floor(Math.random()*99)})`,
+  ()=>`local ${randId()} = string.char(${Math.floor(Math.random()*90)+32})`,
+  ()=>`local ${randId()} = math.floor(${Math.floor(Math.random()*999)}/${Math.floor(Math.random()*9)+1})`,
+  ()=>`-- ${Array.from({length:8},()=>Math.floor(Math.random()*256).toString(16).padStart(2,'0')).join('')}`,
 ];
 
-function insertJunk(code) {
-  const lines = code.split('\n');
-  const result = [];
-  for (const line of lines) {
+function insertJunk(code){
+  const lines=code.split('\n');
+  const result=[];
+  for(const line of lines){
     result.push(line);
-    if (Math.random() < 0.35) {
-      const junk = JUNK_LINES[Math.floor(Math.random() * JUNK_LINES.length)];
-      result.push(junk());
-    }
+    if(Math.random()<0.35) result.push(JUNK[Math.floor(Math.random()*JUNK.length)]());
   }
   return result.join('\n');
 }
 
-// ── Control Flow Wrap ─────────────────────────────────────────────────────────
-
-function wrapControlFlow(code) {
-  const key = Math.floor(Math.random() * 89) + 10;
-  const varName = randId(5);
-  const header = `local ${varName} = ${key}\nif (${varName} - ${key}) == 0 then\n`;
-  const footer = `\nend`;
-  // Indent code
-  const indented = code.split('\n').map(l => '  ' + l).join('\n');
-  return header + indented + footer;
+function wrapControlFlow(code){
+  const key=Math.floor(Math.random()*89)+10;
+  const v=randId();
+  const header=`local ${v} = ${key}\nif (${v} - ${key}) == 0 then\n`;
+  const footer=`\nend`;
+  const indented=code.split('\n').map(l=>'  '+l).join('\n');
+  return header+indented+footer;
 }
 
-// ── Master Obfuscate ──────────────────────────────────────────────────────────
-
-function obfuscate() {
-  const input = document.getElementById('input').value.trim();
-  const status = document.getElementById('status');
-
-  if (!input) {
-    status.textContent = 'No input provided.';
-    status.className = 'status err';
-    return;
-  }
-
-  const useNums    = document.getElementById('opt-nums').checked;
-  const useVars    = document.getElementById('opt-vars').checked;
-  const useJunk    = document.getElementById('opt-junk').checked;
-  const useEncode  = document.getElementById('opt-encode').checked;
-  const useFlatten = document.getElementById('opt-flatten').checked;
-
-  try {
-    let code = input;
-
-    // Strip existing comments (line comments)
-    code = code.replace(/--[^\n]*/g, '');
-
-    if (useVars)    code = renameVariables(code);
-    if (useNums)    code = obfuscateStrings(code);
-    if (useEncode)  code = obfuscateNumbers(code);
-    if (useJunk)    code = insertJunk(code);
-    if (useFlatten) code = wrapControlFlow(code);
-
-    const header = `-- obfuscated with Obscura\n`;
-    document.getElementById('output').value = header + code;
-
-    const lines = code.split('\n').length;
-    status.textContent = `✓ Done — ${lines} lines generated`;
-    status.className = 'status ok';
-  } catch(e) {
-    status.textContent = `Error: ${e.message}`;
-    status.className = 'status err';
+function obfuscate(){
+  const input=document.getElementById('input').value.trim();
+  const status=document.getElementById('status');
+  if(!input){status.textContent='No input provided.';status.className='status err';return;}
+  const useNums=document.getElementById('opt-nums').checked;
+  const useVars=document.getElementById('opt-vars').checked;
+  const useJunk=document.getElementById('opt-junk').checked;
+  const useEncode=document.getElementById('opt-encode').checked;
+  const useFlatten=document.getElementById('opt-flatten').checked;
+  try{
+    let code=input;
+    code=code.replace(/--[^\n]*/g,'');
+    if(useVars) code=renameVariables(code);
+    // FIX: strings FIRST, then number encoding so string.char() args are already locked in
+    if(useNums) code=obfuscateStrings(code);
+    // FIX: number encoding uses masking to skip string.char() regions
+    if(useEncode) code=obfuscateNumbers(code);
+    if(useJunk) code=insertJunk(code);
+    if(useFlatten) code=wrapControlFlow(code);
+    const header=`-- obfuscated with Obscura\n`;
+    document.getElementById('output').value=header+code;
+    const lines=code.split('\n').length;
+    status.textContent=`✓ Done — ${lines} lines generated`;
+    status.className='status ok';
+  }catch(e){
+    status.textContent=`Error: ${e.message}`;
+    status.className='status err';
   }
 }
 
-function copyOutput() {
-  const out = document.getElementById('output');
-  if (!out.value) return;
-  navigator.clipboard.writeText(out.value).then(() => {
-    const s = document.getElementById('status');
-    s.textContent = '✓ Copied to clipboard';
-    s.className = 'status ok';
+function copyOutput(){
+  const out=document.getElementById('output');
+  if(!out.value) return;
+  navigator.clipboard.writeText(out.value).then(()=>{
+    const s=document.getElementById('status');
+    s.textContent='✓ Copied to clipboard';
+    s.className='status ok';
   });
 }
 
-function clearAll() {
-  document.getElementById('input').value = '';
-  document.getElementById('output').value = '';
-  document.getElementById('status').textContent = '';
-  document.getElementById('status').className = 'status';
+function clearAll(){
+  document.getElementById('input').value='';
+  document.getElementById('output').value='';
+  const s=document.getElementById('status');
+  s.textContent='';s.className='status';
 }
 
-function loadExample() {
-  document.getElementById('input').value =
+function loadExample(){
+  document.getElementById('input').value=
 `local player = "Hero"
 local score = 0
 local lives = 3
@@ -473,9 +237,7 @@ greet(player)
 addScore(50)
 addScore(75)
 print("Final score: " .. score)`;
-  document.getElementById('status').textContent = 'Example loaded.';
-  document.getElementById('status').className = 'status ok';
+  document.getElementById('status').textContent='Example loaded.';
+  document.getElementById('status').className='status ok';
 }
 </script>
-</body>
-</html>
